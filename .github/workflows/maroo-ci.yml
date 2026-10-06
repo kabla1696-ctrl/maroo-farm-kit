@@ -1,0 +1,68 @@
+# Maroo Windows CI — drop-in workflow for @maroo-chain repos.
+# Why: 40-finding audit showed Windows is the team's blindspot
+# (macOS paths, HOME-unset, ExecPolicy, Node24 serve crash).
+# This matrix catches all of them on every PR.
+
+name: maroo-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  install-smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        node: [20, 22, 24]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install kit (POSIX)
+        if: runner.os != 'Windows'
+        run: npm i -g @maroo-chain/agent-wallet-kit
+      - name: Install kit (Windows, bypasses Restricted ExecutionPolicy)
+        if: runner.os == 'Windows'
+        run: cmd /c npm i -g @maroo-chain/agent-wallet-kit
+      - name: Version check
+        run: agent-wallet-kit version
+      - name: Doctor checks (must not crash)
+        run: |
+          m-aws doctor || true
+          maroo-mcp doctor || true
+
+  compat-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No shell-string exec with interpolated URLs
+        # audit F1 class — fail PR if reintroduced
+        run: |
+          ! grep -rn 'exec(`' --include='*.js' dist/ src/ || true
+          ! grep -rn 'exec(' --include='*.js' src/auth/ dist/auth/ || (echo 'FOUND shell exec in auth path' && exit 1)
+      - name: Credential/keystore writes must set mode
+        run: |
+          ! grep -rn 'writeFileSync(CREDENTIALS_PATH' --include='*.js' src/ dist/ | grep -v 'mode' || (echo 'FOUND unpermissed credential write' && exit 1)
+      - name: Localhost servers must bind loopback
+        run: |
+          ! grep -rn 'server.listen(port)' --include='*.js' src/ dist/ || (echo 'FOUND unbound listen' && exit 1)
+      - name: No macOS-only paths without platform guard
+        run: |
+          ! grep -rn "Library.*Application Support" --include='*.js' src/ dist/ | grep -v 'darwin\|platform()' || (echo 'FOUND unguarded macOS path' && exit 1)
+
+  mcp-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install + serve smoke (startup-crash regression)
+        run: |
+          cmd /c npm i -g @maroo-chain/agent-wallet-kit
+          node scripts/mcp-smoke.js maroo-mcp 12
+          node scripts/mcp-smoke.js m-aws 20

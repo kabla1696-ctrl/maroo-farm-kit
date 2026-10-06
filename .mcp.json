@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "maws": {
+      "command": "npx",
+      "args": ["-y", "@maroo-chain/m-aws", "serve"]
+    },
+    "maroo": {
+      "command": "npx",
+      "args": ["-y", "@maroo-chain/mcp", "serve"]
+    }
+  }
+}

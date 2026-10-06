@@ -1,0 +1,22 @@
+node_modules/
+scripts/state.json
+logs/
+backups/
+.env
+*.bak
+# throwaway test passphrase lives here — never commit real secrets
+scripts/args-wcreate.json
+# PRIVATE security disclosure pack — never publish pre-fix (see REWARD-PLAN.md)
+DISCLOSURE.md
+patches/orig/
+patches/fixed/
+patches/social-auth.diff
+patches/prompt-failclosed.diff
+scripts/copy-orig.js
+scripts/copy-prompt.js
+scripts/copy-ui.js
+scripts/gen-diff.js
+# Full audit contains private pre-fix findings — public redacted copy only
+AUDIT.md
+# Private playbook (names critical findings) — never publish
+REWARD-PLAN.md

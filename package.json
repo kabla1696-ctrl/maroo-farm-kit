@@ -1,0 +1,21 @@
+{
+  "name": "maroo-airdrop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Maroo testnet airdrop farming workspace (agent-wallet-kit)",
+  "scripts": {
+    "status": "cmd /c m-aws status",
+    "doctor": "cmd /c m-aws doctor",
+    "doctor:maroo": "cmd /c maroo-mcp doctor",
+    "drip": "cmd /c m-aws drip",
+    "drip:json": "cmd /c m-aws drip --json",
+    "farm:status": "node scripts/farm.js status",
+    "farm:report": "node scripts/farm.js report",
+    "farm:watch": "node scripts/farm.js drip-watch --rounds=6 --waitMs=120000",
+    "faucet:doctor": "node scripts/faucet-doctor.js --probe-drip",
+    "secure": "node scripts/maroo-harden.js --fix",
+    "farm:daemon": "node scripts/farm-daemon.js --intervalMs=1800000",
+    "mcp": "node scripts/mcp-call.js"
+  }
+}
