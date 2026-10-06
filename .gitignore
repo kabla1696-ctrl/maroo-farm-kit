@@ -20,3 +20,9 @@ scripts/gen-diff.js
 AUDIT.md
 # Private playbook (names critical findings) — never publish
 REWARD-PLAN.md
+# Account-linked farm data — local only (tools-only public repo)
+scripts/config.local.json
+scripts/args-*.json
+scripts/agent-*.json
+REPORT.md
+FARM-LOG.md
